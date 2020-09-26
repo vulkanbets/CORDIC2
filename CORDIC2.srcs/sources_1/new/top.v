@@ -24,12 +24,13 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     reg d = 0;                                                  // d;  1 = add;  0 = subtract;
     wire d_y = ~d;                                              // d value but for y;  1 = subtract; 0 = add
     
-    reg rotated_angle;                                                                      // 0 = not rotated; 1 = rotated
-    reg  signed [31 : 0] final_Angle;                                                       // reference angle
-    wire signed [31 : 0] reference_Angle = angle;                                           // reference angle
-    wire signed [31 : 0] out_bounds_reference_Angle = reference_Angle - 32'h2d000000;       // reference - 180 angle;
+    reg rotated_angle;                                                                                   // 0 = not rotated; 1 = rotated
+    reg  signed [31 : 0] final_Angle;                                                                    // final angle
+    wire signed [31 : 0] reference_Angle = angle;                                                        // reference angle
+    wire signed [31 : 0] out_bounds_reference_Angle = 
+    reference_Angle >= 32'h43800000 ? reference_Angle - 32'h43800000 : reference_Angle - 32'h2d000000;   // reference - 180 angle;
     always @ (*) 
-        if( (reference_Angle > 32'h16800000) && (reference_Angle < 32'h43800000) )
+        if( (reference_Angle > 32'h16800000) )
         begin
             final_Angle <= out_bounds_reference_Angle;
             rotated_angle <= 1;
@@ -61,7 +62,7 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     wire signed [WIO + WFO - 1 : 0] x_Adder_Out;                            // x Adder Output
     
     
-    always @ (*) if(z_Adder_In1 < reference_Angle) d <= 0; else d <= 1;
+    always @ (*) if(z_Adder_In1 < final_Angle) d <= 0; else d <= 1;
     
     
         // <--------------------------z Register------------------------------->
