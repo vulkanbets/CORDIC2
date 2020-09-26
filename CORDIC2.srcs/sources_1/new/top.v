@@ -29,7 +29,7 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     wire signed [31 : 0] reference_Angle = angle;                                           // reference angle
     wire signed [31 : 0] out_bounds_reference_Angle = reference_Angle - 32'h2d000000;       // reference - 180 angle;
     always @ (*) 
-        if( (reference_Angle > 32'h16800000) || (reference_Angle < 32'he9800000) )
+        if( (reference_Angle > 32'h16800000) && (reference_Angle < 32'h43800000) )
         begin
             final_Angle <= out_bounds_reference_Angle;
             rotated_angle <= 1;

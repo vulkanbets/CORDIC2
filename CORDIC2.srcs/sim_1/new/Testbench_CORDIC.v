@@ -6,12 +6,13 @@ parameter WI1 = 10, WF1 = 22,               // input 1 integer and fraction bits
           WIO = WI1 > WI2 ? WI1 : WI2,      // output integer bits
           WFO = WF1 > WF2 ? WF1 : WF2;      // output fraction bits
 // Inputs 
-reg [31 : 0] angle = 32'he9800000;                  // input degrees
+reg [31 : 0] angle = 32'h16c00000;                  // input degrees
 reg RESET = 0;
 reg CLK = 0;
 // Outputs 
 wire signed [31 : 0] reference_Angle = DUT.reference_Angle;                             // Reference angle
 wire signed [31 : 0] out_bounds_reference_Angle = DUT.out_bounds_reference_Angle;       // reference - 180 angle
+wire rotated_angle = DUT.rotated_angle;                                                 // 0 = not rotated; 1 = rotated
 wire [31 : 0] LUT [0 : 9] = DUT.LUT;                                                    // Lookup table for tan inverse values
 wire [31 : 0] value = DUT.z_Register.value;                                             // current value of the z register
 wire signed [WI1 + WF1 - 1 : 0] z_Adder_In1 = DUT.z_Adder_In1;                          // z Add # 1
