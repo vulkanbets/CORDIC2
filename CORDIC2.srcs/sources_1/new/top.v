@@ -18,22 +18,29 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     localparam signed [31 : 0] initial_y = 32'h00000000;               // Initial value for y; y = 0.0000
     localparam signed [31 : 0] initial_z = 32'h00000000;               // Initial value for z; z = 0.0000
     
-    reg [31 : 0] LUT [0 : 9];                                   // Lookup table for tan inverse values
-    initial $readmemh("my_LUT_Memory.mem", LUT);                // Initialize LUT @ time = 0
-    reg [3 : 0] counter = 0;                                    // i = 0
-    reg d = 0;                                                  // d;  1 = add;  0 = subtract;
-    wire d_y = ~d;                                              // d value but for y;  1 = subtract; 0 = add
+    reg [1 : 0] quadrant;                           // 0=1; 1=2; 2=3; 3=4
+    
+    reg [31 : 0] LUT [0 : 9];                       // Lookup table for tan inverse values
+    initial $readmemh("my_LUT_Memory.mem", LUT);    // Initialize LUT @ time = 0
+    reg [3 : 0] counter = 0;                        // i = 0
+    reg d = 0;                                      // d;  1 = add;  0 = subtract;
+    wire d_y = ~d;                                  // d value but for y;  1 = subtract; 0 = add
     
     reg rotated_angle;                                                                                   // 0 = not rotated; 1 = rotated
     reg  signed [31 : 0] final_Angle;                                                                    // final angle
     wire signed [31 : 0] reference_Angle = angle;                                                        // reference angle
     wire signed [31 : 0] out_bounds_reference_Angle = 
-    reference_Angle >= 32'h43800000 ? reference_Angle - 32'h43800000 : reference_Angle - 32'h2d000000;   // reference - 180 angle;
+    reference_Angle >= 32'h43800000 ? reference_Angle - 32'h5a000000 : reference_Angle - 32'h2d000000;   // reference - 180 angle;
     always @ (*) 
-        if( (reference_Angle > 32'h16800000) )
+        if(  (reference_Angle > 32'h16800000) && (reference_Angle != 32'h5a000000)  )
         begin
             final_Angle <= out_bounds_reference_Angle;
             rotated_angle <= 1;
+        end
+        else if(reference_Angle == 32'h5a000000)
+        begin
+            final_Angle <= 0;
+            rotated_angle <= 0;
         end
         else
         begin
@@ -60,6 +67,14 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     wire signed [WI2 + WF2 - 1 : 0] x_Adder_In2_Comp;                       // x Add # 2 two's compliment
     wire signed [WI2 + WF2 - 1 : 0] x_Mux_Out;                              // x Mux Out
     wire signed [WIO + WFO - 1 : 0] x_Adder_Out;                            // x Adder Output
+    
+    always @ (*)
+    begin
+        if(reference_Angle <= 32'h16800000 || reference_Angle == 32'h5a000000) quadrant <= 0;       // 0-90
+        else if(reference_Angle > 32'h16800000 && reference_Angle <= 32'h2d000000) quadrant <= 1;   // 91-180
+        else if(reference_Angle > 32'h2d000000 && reference_Angle < 32'h43800000) quadrant <= 2;    // 181-269
+        else  quadrant <= 3;                                                                        // 270-259
+    end
     
     
     always @ (*) if(z_Adder_In1 < final_Angle) d <= 0; else d <= 1;
