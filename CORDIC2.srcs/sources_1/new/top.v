@@ -18,6 +18,11 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     localparam signed [31 : 0] initial_y = 32'h00000000;               // Initial value for y; y = 0.0000
     localparam signed [31 : 0] initial_z = 32'h00000000;               // Initial value for z; z = 0.0000
     
+    reg [31 : 0] precise_sine;      // To compute the precise sine
+    reg [31 : 0] precise_cosine;    // To compute the precise cosine
+    reg [9  : 0] out_sine;          // Output for sine
+    reg [9  : 0] out_cosine;        // Output for cosine
+    
     reg [1 : 0] quadrant;                           // 0=1; 1=2; 2=3; 3=4
     
     reg [31 : 0] LUT [0 : 9];                       // Lookup table for tan inverse values
@@ -113,6 +118,21 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
         //   <-----------------------------x Adder----------------------------->
     add_Fixed # ( .WI1(WI1), .WF1(WF1), .WI2(WI2), .WF2(WF2), .WIO(WIO), .WFO(WFO) )
                     x_Adder( .RESET(0), .in1(x_Adder_In1), .in2(x_Mux_Out), .out(x_Adder_Out) );
+    
+    
+    always @ (*)
+    begin
+//        if(reference_Angle > 32'h16800000 && reference_Angle < 32'h43800000)
+            
+//        else
+            precise_cosine <= y_Adder_In1;
+            precise_sine   <= x_Adder_In1;
+    end
+    
+    
+    
+    
+    
 endmodule
 
 
