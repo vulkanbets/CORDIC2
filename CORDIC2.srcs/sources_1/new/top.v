@@ -9,8 +9,8 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     input [31 : 0] angle,               // 32-bit input
     input CLK,
     input RESET,
-    output sine,                        // 10-bit output;   Q3.7 format
-    output cosine                       // 10-bit output    Q3.7 format
+    output sine,                        // 10-bit output;   Q2.8 format
+    output cosine                       // 10-bit output    Q2.8 format
 );
        //<--------------------- This will all be done in Q10.22 format------------------>
        //<--------------------- This will all be done in Q10.22 format------------------>
@@ -24,7 +24,21 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     reg d = 0;                                                  // d;  1 = add;  0 = subtract;
     wire d_y = ~d;                                              // d value but for y;  1 = subtract; 0 = add
     
-    wire signed [31 : 0] reference_Angle = angle;                   // reference angle
+    reg rotated_angle;                                                                      // 0 = not rotated; 1 = rotated
+    reg  signed [31 : 0] final_Angle;                                                       // reference angle
+    wire signed [31 : 0] reference_Angle = angle;                                           // reference angle
+    wire signed [31 : 0] out_bounds_reference_Angle = reference_Angle - 32'h2d000000;       // reference - 180 angle;
+    always @ (*) 
+        if( (reference_Angle > 32'h16800000) || (reference_Angle < 32'he9800000) )
+        begin
+            final_Angle <= out_bounds_reference_Angle;
+            rotated_angle <= 1;
+        end
+        else
+        begin
+            final_Angle <= reference_Angle;
+            rotated_angle <= 0;
+        end
     
     wire signed [WI1 + WF1 - 1 : 0] z_Adder_In1;                            // z Add # 1
     wire signed [WI2 + WF2 - 1 : 0] z_Adder_In2 = LUT[counter];             // z Add # 2
@@ -50,7 +64,6 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     always @ (*) if(z_Adder_In1 < reference_Angle) d <= 0; else d <= 1;
     
     
-    
         // <--------------------------z Register------------------------------->
     register z_Register( .CLK(CLK), .RESET(RESET), .in(z_Adder_Out), .out(z_Adder_In1) );
      // <-----------------------------two's compliment---------------------------------->
@@ -61,8 +74,6 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     add_Fixed # ( .WI1(WI1), .WF1(WF1), .WI2(WI2), .WF2(WF2), .WIO(WIO), .WFO(WFO) )
                     z_Adder( .RESET(0), .in1(z_Adder_In1), .in2(z_Mux_Out), .out(z_Adder_Out) );
     //<-----------------------------initialize Z Register------------------------------->
-    
-    
     
     
         // <--------------------------y Register------------------------------->
