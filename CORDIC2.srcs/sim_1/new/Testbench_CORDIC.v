@@ -6,7 +6,7 @@ parameter WI1 = 10, WF1 = 22,               // input 1 integer and fraction bits
           WIO = WI1 > WI2 ? WI1 : WI2,      // output integer bits
           WFO = WF1 > WF2 ? WF1 : WF2;      // output fraction bits
 // Inputs 
-reg [31 : 0] angle = 32'h43800000;                  // input degrees
+reg [31 : 0] angle = 32'h59970a3d;                  // input degrees
 reg RESET = 0;
 reg CLK = 0;
 // Outputs 
