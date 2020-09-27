@@ -6,7 +6,7 @@ parameter WI1 = 10, WF1 = 22,               // input 1 integer and fraction bits
           WIO = WI1 > WI2 ? WI1 : WI2,      // output integer bits
           WFO = WF1 > WF2 ? WF1 : WF2;      // output fraction bits
 // Inputs 
-reg [31 : 0] angle = 32'h457f5c29;                  // input degrees
+reg [31 : 0] angle = 32'h4b000000;                  // input degrees
 reg RESET = 0;
 reg CLK = 0;
 // Outputs 
@@ -22,8 +22,10 @@ wire signed [WI2 + WF2 - 1 : 0] z_Adder_In2 = DUT.z_Adder_In2;                  
 wire signed [WI2 + WF2 - 1 : 0] z_Adder_In2_Comp = DUT.z_Adder_In2_Comp;                // z Add # 2 two's compliment
 wire signed [WIO + WFO - 1 : 0] z_Adder_Out = DUT.z_Adder_Out;                          // z Adder Output
 wire d = DUT.d;                                                                         // d;  1 = add;  0 = subtract;
-wire [31 : 0] precise_sine = DUT.precise_sine;              // To compute the precise sine
-wire [31 : 0] precise_cosine = DUT.precise_cosine;          // To compute the precise cosine
+wire [31 : 0] precise_sine = DUT.precise_sine;                  // To compute the precise sine
+wire [31 : 0] precise_cosine = DUT.precise_cosine;              // To compute the precise cosine
+wire [31 : 0] precise_sine_neg = DUT.precise_sine_neg;          // To compute the precise sine
+wire [31 : 0] precise_cosine_neg = DUT.precise_cosine_neg;      // To compute the precise cosine
 
 wire [31 : 0] value_x = DUT.y_Register.value;                               // current value of the y register
 wire signed [WI1 + WF1 - 1 : 0] y_Adder_In1 = DUT.y_Adder_In1;              // y Add # 1

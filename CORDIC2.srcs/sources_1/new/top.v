@@ -18,10 +18,10 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     localparam signed [31 : 0] initial_y = 32'h00000000;               // Initial value for y; y = 0.0000
     localparam signed [31 : 0] initial_z = 32'h00000000;               // Initial value for z; z = 0.0000
     
-    reg [31 : 0] precise_sine;      // To compute the precise sine
-    reg [31 : 0] precise_cosine;    // To compute the precise cosine
-    reg [9  : 0] out_sine;          // Output for sine
-    reg [9  : 0] out_cosine;        // Output for cosine
+    reg [31 : 0] precise_sine = 0;      // To compute the precise sine
+    reg [31 : 0] precise_cosine = 0;    // To compute the precise cosine
+    reg [9  : 0] out_sine;              // Output for sine
+    reg [9  : 0] out_cosine;            // Output for cosine
     
     reg [1 : 0] quadrant;                           // 0=1; 1=2; 2=3; 3=4
     
@@ -120,13 +120,30 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
                     x_Adder( .RESET(0), .in1(x_Adder_In1), .in2(x_Mux_Out), .out(x_Adder_Out) );
     
     
+    // <--------------------------Negate cosine and sine to get inverse angles------------------------------->
+    wire [31 : 0] precise_sine_neg;      // To compute the precise sine
+    wire [31 : 0] precise_cosine_neg;    // To compute the precise cosine
+    twos_Compliment twos_Comp_precise_cosine( .in( y_Adder_In1 ), .out( precise_cosine_neg ) );
+    twos_Compliment   twos_Comp_precise_sine( .in( x_Adder_In1 ), .out( precise_sine_neg ) );
+    
     always @ (*)
     begin
-//        if(reference_Angle > 32'h16800000 && reference_Angle < 32'h43800000)
-            
-//        else
-            precise_cosine <= y_Adder_In1;
-            precise_sine   <= x_Adder_In1;
+        if(reference_Angle > 32'h16800000 && reference_Angle < 32'h43800000)
+        begin
+            if(counter == 9)
+            begin
+                precise_cosine <= precise_cosine_neg;
+                precise_sine   <= precise_sine_neg;
+            end
+        end
+        else
+        begin
+            if(counter == 9)
+            begin
+                precise_cosine <= y_Adder_In1;
+                precise_sine   <= x_Adder_In1;
+            end
+        end
     end
     
     
