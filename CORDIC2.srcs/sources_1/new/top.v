@@ -34,7 +34,12 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     wire signed [31 : 0] out_bounds_reference_Angle = 
     reference_Angle >= 32'h43800000 ? reference_Angle - 32'h5a000000 : reference_Angle - 32'h2d000000;   // reference - 180 angle;
     always @ (*) 
-        if(  (reference_Angle > 32'h16800000) && (reference_Angle != 32'h5a000000)  )
+        if(  (reference_Angle > 32'h16800000) && (reference_Angle < 32'h43800000)  )
+        begin
+            final_Angle <= out_bounds_reference_Angle;
+            rotated_angle <= 1;
+        end
+        else if( (reference_Angle >= 32'h43800000) && (reference_Angle < 32'h5a000000) )
         begin
             final_Angle <= out_bounds_reference_Angle;
             rotated_angle <= 1;
@@ -95,11 +100,12 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     
     
         // <--------------------------y Register------------------------------->
-    register y_Register( .CLK(CLK), .RESET(RESET), .in(y_Adder_Out), .out(y_Adder_In1) );
+    register # (.set_x_val(0)) 
+        y_Register( .CLK(CLK), .RESET(RESET), .in(y_Adder_Out), .out(y_Adder_In1) );
      // <-----------------------------two's compliment---------------------------------->
     twos_Compliment twos_Comp_Y( .in( y_Adder_In2 ), .out( y_Adder_In2_Comp ) );
      // <--------------------------y Register Negative Mux------------------------------->
-    mux y_Reg_Neg_Mux( .sel(d_y), .A(  y_Adder_In2  ), .B(  y_Adder_In2_Comp  ), .out(y_Mux_Out) );
+    mux y_Reg_Neg_Mux( .sel(d), .A(  y_Adder_In2  ), .B(  y_Adder_In2_Comp  ), .out(y_Mux_Out) );
         //   <-----------------------------y Adder----------------------------->
     add_Fixed # ( .WI1(WI1), .WF1(WF1), .WI2(WI2), .WF2(WF2), .WIO(WIO), .WFO(WFO) )
                     y_Adder( .RESET(0), .in1(y_Adder_In1), .in2(y_Mux_Out), .out(y_Adder_Out) );
@@ -111,7 +117,7 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
      // <-----------------------------two's compliment---------------------------------->
     twos_Compliment twos_Comp_X( .in(x_Adder_In2), .out(x_Adder_In2_Comp) );
      // <--------------------------x Register Negative Mux------------------------------->
-    mux x_Reg_Neg_Mux( .sel(d), .A( x_Adder_In2 ), .B( ( x_Adder_In2_Comp ) ), .out(x_Mux_Out) );
+    mux x_Reg_Neg_Mux( .sel(d_y), .A( x_Adder_In2 ), .B( ( x_Adder_In2_Comp ) ), .out(x_Mux_Out) );
         //   <-----------------------------x Adder----------------------------->
     add_Fixed # ( .WI1(WI1), .WF1(WF1), .WI2(WI2), .WF2(WF2), .WIO(WIO), .WFO(WFO) )
                     x_Adder( .RESET(0), .in1(x_Adder_In1), .in2(x_Mux_Out), .out(x_Adder_Out) );
@@ -119,20 +125,19 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     
     // <--------------------------Negate cosine and sine to get inverse angles------------------------------->
     // <-----------------------------------Output will be in Q2.8 format------------------------------------>
-    reg [31 : 0] precise_sine = 0;                                                                  // To compute the precise sine
-    reg [31 : 0] precise_cosine = 0;                                                                // To compute the precise cosine
-    reg [9  : 0] out_sine;
+    reg [31 : 0] precise_cosine = 0;                                // To compute the precise cosine
+    reg [31 : 0] precise_sine = 0;                                  // To compute the precise sine
     reg [9  : 0] out_cosine;
+    reg [9  : 0] out_sine;
     always @ (*)
     begin
-        out_sine =   { precise_sine[31] , precise_sine[22 : 14] };                      // Output for sine
         out_cosine = { precise_cosine[31] , precise_cosine[22 : 14] };                  // Output for cosine
+        out_sine =   { precise_sine[31] , precise_sine[22 : 14] };                      // Output for sine
     end
-    wire [31 : 0] precise_sine_neg;                                                                 // To compute the precise sine
     wire [31 : 0] precise_cosine_neg;                                                               // To compute the precise cosine
-    twos_Compliment twos_Comp_precise_cosine( .in( y_Adder_In1 ), .out( precise_cosine_neg ) );
-    twos_Compliment   twos_Comp_precise_sine( .in( x_Adder_In1 ), .out( precise_sine_neg ) );
-    
+    wire [31 : 0] precise_sine_neg;                                                                 // To compute the precise sine
+    twos_Compliment twos_Comp_precise_cosine( .in( x_Adder_Out ), .out( precise_cosine_neg ) );
+    twos_Compliment   twos_Comp_precise_sine( .in( y_Adder_Out ), .out( precise_sine_neg ) );
     always @ (*)
     begin
         if(reference_Angle > 32'h16800000 && reference_Angle < 32'h43800000)
@@ -147,16 +152,13 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
         begin
             if(counter == 9)
             begin
-                precise_cosine <= y_Adder_In1;
-                precise_sine   <= x_Adder_In1;
+                precise_cosine <= x_Adder_Out;
+                precise_sine   <= y_Adder_Out;
             end
         end
     end
-    
-    assign sine = out_sine;
     assign cosine = out_cosine;
-    
-    
+    assign sine = out_sine;
 endmodule
 
 

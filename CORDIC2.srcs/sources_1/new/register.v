@@ -13,12 +13,36 @@ module register # ( parameter WI1 = 10, WF1 = 22,
     reg [31 : 0] value;
     initial
     begin
-        if(set_x_val == 0) out <= top.initial_x;
-        else out <= 0;
+        if(set_x_val == 1)
+        begin
+            out <= top.initial_x;
+        end
+        else
+        begin
+            out <= 0;
+        end
     end
-    always @ (posedge CLK)  out <= value;
+    
+    always @ (posedge CLK)
+    begin
+        out <= value;
+    end
+    
     always @ (*)
     begin
-        if(RESET) begin out <= 0; value <= in; end else value <= in;
+        if(RESET)
+        begin
+            if(set_x_val == 1)
+            begin
+                out <= top.initial_x;
+                value <= in;
+            end
+            else
+            begin
+                out <= 0;
+                value <= in;
+            end
+        end
+        else value <= in;
     end
 endmodule
