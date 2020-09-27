@@ -26,6 +26,8 @@ wire [31 : 0] precise_sine = DUT.precise_sine;                  // To compute th
 wire [31 : 0] precise_cosine = DUT.precise_cosine;              // To compute the precise cosine
 wire [31 : 0] precise_sine_neg = DUT.precise_sine_neg;          // To compute the precise sine
 wire [31 : 0] precise_cosine_neg = DUT.precise_cosine_neg;      // To compute the precise cosine
+wire [9  : 0] out_sine = DUT.out_sine;                          // Final Output for sine
+wire [9  : 0] out_cosine = DUT.out_cosine;                      // Final Output for cosine
 
 wire [31 : 0] value_x = DUT.y_Register.value;                               // current value of the y register
 wire signed [WI1 + WF1 - 1 : 0] y_Adder_In1 = DUT.y_Adder_In1;              // y Add # 1

@@ -9,8 +9,8 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     input [31 : 0] angle,               // 32-bit input
     input CLK,
     input RESET,
-    output sine,                        // 10-bit output;   Q2.8 format
-    output cosine                       // 10-bit output    Q2.8 format
+    output [9  : 0] sine,                        // 10-bit output;   Q2.8 format
+    output [9  : 0] cosine                       // 10-bit output    Q2.8 format
 );
        //<--------------------- This will all be done in Q10.22 format------------------>
        //<--------------------- This will all be done in Q10.22 format------------------>
@@ -18,10 +18,7 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     localparam signed [31 : 0] initial_y = 32'h00000000;               // Initial value for y; y = 0.0000
     localparam signed [31 : 0] initial_z = 32'h00000000;               // Initial value for z; z = 0.0000
     
-    reg [31 : 0] precise_sine = 0;      // To compute the precise sine
-    reg [31 : 0] precise_cosine = 0;    // To compute the precise cosine
-    reg [9  : 0] out_sine;              // Output for sine
-    reg [9  : 0] out_cosine;            // Output for cosine
+    
     
     reg [1 : 0] quadrant;                           // 0=1; 1=2; 2=3; 3=4
     
@@ -121,8 +118,18 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
     
     
     // <--------------------------Negate cosine and sine to get inverse angles------------------------------->
-    wire [31 : 0] precise_sine_neg;      // To compute the precise sine
-    wire [31 : 0] precise_cosine_neg;    // To compute the precise cosine
+    // <-----------------------------------Output will be in Q2.8 format------------------------------------>
+    reg [31 : 0] precise_sine = 0;                                                                  // To compute the precise sine
+    reg [31 : 0] precise_cosine = 0;                                                                // To compute the precise cosine
+    reg [9  : 0] out_sine;
+    reg [9  : 0] out_cosine;
+    always @ (*)
+    begin
+        out_sine =   { precise_sine[31] , precise_sine[22 : 14] };                      // Output for sine
+        out_cosine = { precise_cosine[31] , precise_cosine[22 : 14] };                  // Output for cosine
+    end
+    wire [31 : 0] precise_sine_neg;                                                                 // To compute the precise sine
+    wire [31 : 0] precise_cosine_neg;                                                               // To compute the precise cosine
     twos_Compliment twos_Comp_precise_cosine( .in( y_Adder_In1 ), .out( precise_cosine_neg ) );
     twos_Compliment   twos_Comp_precise_sine( .in( x_Adder_In1 ), .out( precise_sine_neg ) );
     
@@ -146,8 +153,8 @@ module top # ( parameter    WI1 = 10, WF1 = 22,                     // input 1 i
         end
     end
     
-    
-    
+    assign sine = out_sine;
+    assign cosine = out_cosine;
     
     
 endmodule
