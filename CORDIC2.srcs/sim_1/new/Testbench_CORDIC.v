@@ -34,7 +34,7 @@ wire signed [WI1 + WF1 - 1 : 0] y_Adder_In1 = DUT.y_Adder_In1;              // y
 wire signed [WI2 + WF2 - 1 : 0] y_Adder_In2 = DUT.y_Adder_In2;              // y Add # 2
 wire signed [WI2 + WF2 - 1 : 0] y_Adder_In2_Comp = DUT.y_Adder_In2_Comp;    // y Add # 2 two's compliment
 wire signed [WIO + WFO - 1 : 0] y_Adder_Out = DUT.y_Adder_Out;              // y Adder Output
-wire signed [WIO + WFO - 1 : 0] y_Mux_Out = DUT.y_Mux_Out;                // y Adder Output
+wire signed [WIO + WFO - 1 : 0] y_Mux_Out = DUT.y_Mux_Out;                  // y Adder Output
     
 wire [31 : 0] value_x = DUT.x_Register.value;                               // current value of the x register
 wire signed [WI1 + WF1 - 1 : 0] x_Adder_In1 = DUT.x_Adder_In1;              // x Add # 1
@@ -43,7 +43,7 @@ wire signed [WI2 + WF2 - 1 : 0] x_Adder_In2_Comp = DUT.x_Adder_In2_Comp;    // x
 wire signed [WIO + WFO - 1 : 0] x_Adder_Out = DUT.x_Adder_Out;              // x Adder Output
 wire signed [WI2 + WF2 - 1 : 0] x_Mux_Out = DUT.x_Mux_Out;                  // x Mux Out
 // Initialize clock
-always #3 CLK <= ~CLK;
+always #2 CLK <= ~CLK;
 // <------------------Increment counter from 0-9 modulus 9-------------------->
 always @ (posedge CLK)
 begin
@@ -51,141 +51,32 @@ begin
     if( DUT.counter == 9 ) DUT.counter <= 0;
         else DUT.counter <= DUT.counter + 1;
 end
+    integer i;
+    integer file;
+    wire [9  : 0] out_cosine = DUT.out_cosine;
+    wire [9  : 0] out_sine = DUT.out_sine;
     initial
     begin
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h00400000;                                  // new value 1
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h16400000;                                  // new value 89
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h16800000;                                  // new value 90
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h16c00000;                                  // new value 91
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h2cc00000;                                  // new value 179
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h2d000000;                                  // new value 180
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h2d400000;                                  // new value 181
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h43400000;                                  // new value 269
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h43800000;                                  // new value 270
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h43c00000;                                  // new value 271
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h59c00000;                                  // new value 359
-        @(posedge CLK);                                         // Clock 0
-        @(posedge CLK);                                         // Clock 1
-        @(posedge CLK);                                         // Clock 2
-        @(posedge CLK);                                         // Clock 3
-        @(posedge CLK);                                         // Clock 4
-        @(posedge CLK);                                         // Clock 5
-        @(posedge CLK);                                         // Clock 6
-        @(posedge CLK);                                         // Clock 7
-        @(posedge CLK);                                         // Clock 8
-        @(posedge CLK);                                         // Clock 9
-        angle <= 32'h5a000000;                                  // new value 360
-        
+        file = $fopen("output.txt");
+        for(i = 0; i < 25; i = i + 1)
+        begin
+            @(posedge CLK);                                         // Clock 0
+            $fwrite(file, "%h\n", out_cosine);
+            $fwrite(file, "%h\n", out_sine);
+            @(posedge CLK);                                         // Clock 1
+            @(posedge CLK);                                         // Clock 2
+            @(posedge CLK);                                         // Clock 3
+            @(posedge CLK);                                         // Clock 4
+            @(posedge CLK);                                         // Clock 5
+            @(posedge CLK);                                         // Clock 6
+            @(posedge CLK);                                         // Clock 7
+            @(posedge CLK);                                         // Clock 8
+            @(posedge CLK);                                         // Clock 9
+            angle <= angle + 32'h03c00000;                          // new value
+        end
+        $fwrite(file, "%h\n", out_cosine);
+        $fwrite(file, "%h\n", out_sine);
+        $fclose(file);
     end
 top DUT( .angle(angle), .CLK(CLK), .RESET(RESET) );             // Instantiate DUT
 endmodule
